@@ -6,7 +6,6 @@ import { generateToken } from '../utils/jwt';
 import { ADMIN_EMAIL, ADMIN_PASSWORD, adminCredentials } from '../utils/common';
 import { HttpStatusCode } from '../interface/utils';
 import { AppError } from '../utils/AppError';
-import { getSidebarByRole } from '../utils/sidebar';
 
 
 export const login = async (req: Request, res: Response) => {
@@ -24,7 +23,6 @@ export const login = async (req: Request, res: Response) => {
   // const token = generateToken(user._id.toString(), user.role, user.name, user.email);
 
   const token = generateToken(adminCredentials);
-  const sidebar = getSidebarByRole(adminCredentials.role);
 
   return res.status(HttpStatusCode.SUCCESS).json({
     success: true,

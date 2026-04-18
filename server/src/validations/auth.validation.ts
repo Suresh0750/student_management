@@ -10,11 +10,11 @@ export const loginSchema = Joi.object({
       "any.required": "Email is required"
     }),
 
-    password: Joi.string()
-    .pattern(new RegExp("^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{6,}$"))
-    .required()
-    .messages({
-      "string.pattern.base": "Password must contain letters and numbers",
-      "string.empty": "Password is required"
-    })
+ password: Joi.string()
+  .pattern(new RegExp("^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{6,}$"))
+  .required()
+  .messages({
+    "string.pattern.base": "Password must contain letters and numbers",
+    "string.empty": "Password is required"
+  })
 });

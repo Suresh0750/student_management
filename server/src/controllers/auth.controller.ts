@@ -4,42 +4,32 @@ import { Request, Response } from 'express';
 import User from '../models/user.schema';
 import { generateToken } from '../utils/jwt';
 import { ADMIN_EMAIL, ADMIN_PASSWORD, adminCredentials } from '../utils/common';
+import { HttpStatusCode } from '../interface/utils';
+import { AppError } from '../utils/AppError';
+import { getSidebarByRole } from '../utils/sidebar';
+
 
 export const login = async (req: Request, res: Response) => {
-    try{
-        const { email=null, password=null} = req.body;
-        // const user = await User.findOne({ email });
+  const { email = null, password = null } = req.body;
+  // const user = await User.findOne({ email });
 
-        if(email !== ADMIN_EMAIL || password !== ADMIN_PASSWORD){
-            return res.status(401).json({
-                success: false,
-                message: 'User not found',
-            });
-        }
+  if (email !== ADMIN_EMAIL || password !== ADMIN_PASSWORD) {
+    throw new AppError("User not found", HttpStatusCode.UNAUTHORIZED);
+  }
 
-        // if(user.password !== password){
-        //     return res.status(401).json({
-        //         success: false,
-        //         message: 'Invalid password',
-        //     });
-        // }
+  // if(user.password !== password){
+  //   throw { status: HttpStatusCode.UNAUTHORIZED, message: "Invalid password" };
+  // }
 
-        // const token = generateToken(user._id.toString(), user.role, user.name, user.email);
+  // const token = generateToken(user._id.toString(), user.role, user.name, user.email);
 
-        const token = generateToken(adminCredentials);
+  const token = generateToken(adminCredentials);
+  const sidebar = getSidebarByRole(adminCredentials.role);
 
-        return res.status(200).json({
-            success: true,
-            // user,
-            token,
-            message: 'Login successful',
-        });
-    }catch(error){
-        console.log(error);
-        return res.status(500).json({
-            success: false,
-            message: 'Internal server error',
-            error: error,
-        });
-    }
+  return res.status(HttpStatusCode.SUCCESS).json({
+    success: true,
+    user : adminCredentials,
+    token,
+    message: "Login successful",
+  });
 }

@@ -8,9 +8,10 @@ export const marksSchema = Joi.object({
   chemistry: Joi.number().min(0).max(100).required(),
 });
 
-export const passwordSchema = Joi.string().trim().min(6).required().messages({
+export const passwordSchema = Joi.string().trim().min(6).pattern(new RegExp("^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{6,}$")).required().messages({
   "string.empty": "Password is required",
   "string.min": "Minimum 6 characters",
+  "string.pattern.base": "Password must be at least 6 characters, including at least 1 letter and 1 number.",
 });
 
 const baseUserFields = {

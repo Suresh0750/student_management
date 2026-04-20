@@ -2,11 +2,14 @@ import { Request, Response } from 'express';
 import User from '../models/user.schema';
 import { HttpStatusCode } from '../interface/utils';
 import { AppError } from '../utils/AppError';
+import { hashPassword } from '../utils/service';
+
 
 
 export const createUser = async (req: Request, res: Response) => {
   const { name, email, phone, password, role } = req.body;
-  const user = await User.create({ name, email, phone, password, role });
+  const hashedPassword = await hashPassword(password);
+  const user = await User.create({ name, email, phone, password: hashedPassword, role });
 
   return res.status(HttpStatusCode.CREATED).json({
     success: true,

@@ -26,8 +26,10 @@ export const login = async (req: Request, res: Response) => {
 
   return res.status(HttpStatusCode.SUCCESS).json({
     success: true,
-    user : adminCredentials,
+    user: adminCredentials,
     token,
     message: "Login successful",
   });
 }
+
+

@@ -1,4 +1,4 @@
-import { useForm, FieldValues, DefaultValues, SubmitHandler ,Resolver} from "react-hook-form";
+import { useForm, FieldValues, DefaultValues, SubmitHandler, Resolver } from "react-hook-form";
 import { joiResolver } from "@/lib/shared/joiResolver";
 import Joi, { Schema } from "joi";
 import { Input } from "../common/Input";
@@ -33,7 +33,7 @@ function DynamicForm<T extends FieldValues>({
   const {
     register,
     handleSubmit,
-    reset, 
+    reset,
     formState: { errors },
   } = useForm<T>({
     defaultValues,
@@ -41,7 +41,7 @@ function DynamicForm<T extends FieldValues>({
   });
   useEffect(() => {
     if (!defaultValues) return;
-  
+
     const filteredValues = fields.reduce<Partial<Record<string, unknown>>>(
       (acc, field) => {
         acc[field.name] = defaultValues[field.name];
@@ -49,11 +49,10 @@ function DynamicForm<T extends FieldValues>({
       },
       {}
     );
-  
+
     reset(filteredValues as DefaultValues<T>);
   }, [defaultValues, fields, reset]);
-  const submitHandler = (data:any)=>{
-    alert("submit data")
+  const submitHandler = (data: any) => {
     onSubmit?.(data)
   }
 

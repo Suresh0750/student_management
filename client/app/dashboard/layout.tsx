@@ -19,7 +19,6 @@ const getSidebarByRole = (role: AppRole): SidebarItem[] => {
     ADMIN: [
       { label: "Students", path: "/dashboard/students" },
       { label: "Teachers", path: "/dashboard/teachers" },
-      { label: "Marks", path: "/dashboard/marks" }
     ],
     TEACHER: [{ label: "Subject", path: "/dashboard" }],
     STUDENT: [{ label: "Marks", path: "/dashboard" }],

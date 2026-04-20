@@ -32,7 +32,7 @@ export default function MarksPage() {
       return;
     }
 
-    if (userRole !== "ADMIN") {
+    if (userRole === "ADMIN") {
       router.replace("/dashboard");
     }
   }, [isAuthenticated, router, userRole]);
@@ -45,7 +45,7 @@ export default function MarksPage() {
     console.log("Delete student:", row);
   }
 
-  if (!isAuthenticated || userRole !== "ADMIN") {
+  if (!isAuthenticated || userRole === "ADMIN") {
     return null;
   }
 

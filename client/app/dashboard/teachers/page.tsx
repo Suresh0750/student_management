@@ -1,16 +1,34 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import DataTable from "@/components/common/data-table";
 import { useAuth } from "@/lib/auth/auth-context";
 import { getUserRole } from "@/lib/auth/role";
 import { IUser } from "@/lib/types";
+import { ActionButton } from "@/components/common/ActionButton";
+import Modal from "@/components/common/Modal";
+import UserForm from "@/components/forms/UserForm";
+import { addUserSchema, editUserSchema } from "@/lib/validation/users.schema";
+import { ADD_FIELDS, EDIT_FIELDS } from "@/lib/shared/constants";
+import useUsers from "@/hooks/useUsers";
 
 export default function TeachersPage() {
   const router = useRouter();
   const { user, isAuthenticated } = useAuth();
-
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
+  const [isEdit, setIsEdit] = useState<boolean>(false)
+  const [editUser, setEditUser] = useState<IUser | null>(null)
+  const {
+    state: {
+      users,
+      isLoading,
+      error
+    },
+    deleteUserApi,
+    updateUserApi,
+    createUserApi
+  } = useUsers()
   const userRole = useMemo(() => getUserRole(user), [user]);
 
   const teacherColumns = useMemo(
@@ -23,6 +41,26 @@ export default function TeachersPage() {
     [],
   );
 
+  const handleCloseModal = () => {
+    if (isEdit) {
+      setIsEdit(false)
+    }
+    if (editUser) {
+      setEditUser(null)
+    }
+    setIsModalOpen(false)
+  }
+  const addTeacher = (data: any) => {
+    console.log("teacher data", data)
+    createUserApi.mutate({ ...data, role: "TEACHER" })
+    handleCloseModal?.()
+  }
+
+  const updateTeacher = (data: any) => {
+    if (!editUser) return
+    updateUserApi.mutate({ id: editUser._id, body: { ...editUser, ...data } });
+    handleCloseModal?.()
+  };
   useEffect(() => {
     if (!isAuthenticated) {
       router.replace("/login");
@@ -42,6 +80,8 @@ export default function TeachersPage() {
     console.log("Delete teacher:", row);
   }
 
+
+
   if (!isAuthenticated || userRole !== "ADMIN") {
     return null;
   }
@@ -52,6 +92,7 @@ export default function TeachersPage() {
       <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
         Admin-only teacher list.
       </p>
+      <ActionButton label="Add Teacher" className="cursor-pointer" onClick={() => setIsModalOpen(true)} />
 
       <div className="mt-6">
         <DataTable<IUser>
@@ -63,6 +104,14 @@ export default function TeachersPage() {
           onDelete={handleDelete}
         />
       </div>
+      <Modal open={isModalOpen} title={isEdit ? "Edit New Teacher" : "Add New Teacher"} onClose={handleCloseModal}>
+        <UserForm
+          schema={isEdit ? editUserSchema : addUserSchema}
+          fields={isEdit ? EDIT_FIELDS : ADD_FIELDS}
+          onSubmit={isEdit ? updateTeacher : addTeacher}
+          defaultValues={isEdit ? editUser : undefined}
+        />
+      </Modal>
     </div>
   );
 }

@@ -98,7 +98,10 @@ export function LoginForm() {
       <button
         type="submit"
         disabled={loginApi.isPending}
-        className="mt-1 flex h-11 w-full items-center justify-center rounded-full bg-foreground px-5 text-sm font-medium text-background transition-colors hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+        className={`mt-1 flex h-11 w-full items-center justify-center rounded-full bg-foreground px-5 text-sm font-medium text-background transition-colors hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60 ${loginApi.isPending
+            ? "cursor-not-allowed opacity-60"
+            : "cursor-pointer hover:opacity-90"
+          }`}
       >
         {loginApi.isPending ? "Signing in…" : "Sign in"}
       </button>

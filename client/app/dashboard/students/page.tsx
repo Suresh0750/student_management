@@ -81,15 +81,15 @@ export default function StudentsPage() {
     console.log("users", users)
   }, [users])
 
-  function handleEdit(row: IUser) {
-    console.log("Edit student:", row);
-  }
   function handleDelete(row: IUser) {
     toast("Are you sure you want to delete?", {
       action: {
         label: "Yes",
         onClick: () => {
+          const toastId = toast.loading("Deleting...");
+
           deleteUserApi.mutate(row._id);
+          toast.success("Deleted", { id: toastId });
         },
       },
       cancel: {

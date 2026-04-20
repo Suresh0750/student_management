@@ -60,8 +60,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const setSession = useCallback((next: AuthSession | null) => {
     setSessionState(next);
-    if (next) localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-    else localStorage.removeItem(STORAGE_KEY);
+    if (next) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+      const role = (next.user as any)?.role || '';
+      document.cookie = `auth_token=${next.token || ''}; path=/; max-age=86400; SameSite=Lax`;
+      document.cookie = `user_role=${role}; path=/; max-age=86400; SameSite=Lax`;
+    } else {
+      localStorage.removeItem(STORAGE_KEY);
+      document.cookie = `auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
+      document.cookie = `user_role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
+    }
   }, []);
 
   const logout = useCallback(() => setSession(null), [setSession]);

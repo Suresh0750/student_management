@@ -60,8 +60,6 @@ const useUsers = () => {
       queryClient.setQueryData<IUser[]>(["users"], (oldUsers = []) => {
         return oldUsers.filter((u) => u._id !== deletedUserId);
       });
-      const message = data.message || "User deleted successfully";
-      toast.success(message);
     },
     onError: (error) => {
       const message = error instanceof Error ? error.message : "Something went wrong";

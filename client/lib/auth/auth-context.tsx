@@ -9,8 +9,9 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { STORAGE_KEY } from "../shared/constants";
 
-const STORAGE_KEY = "student_portal.user";
+
 
 export type AuthUser = Record<string, unknown>;
 export type AuthSession = {

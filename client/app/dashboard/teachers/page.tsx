@@ -122,6 +122,7 @@ export default function TeachersPage() {
             setIsModalOpen(true);
           }}
           onDelete={handleDelete}
+          isLoading={isLoading}
         />
       </div>
       <Modal open={isModalOpen} title={isEdit ? "Edit New Teacher" : "Add New Teacher"} onClose={handleCloseModal}>

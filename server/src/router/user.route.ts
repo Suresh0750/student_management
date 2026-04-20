@@ -9,7 +9,7 @@ const router = Router();
 
 router.post('/create', verifyToken, authorizeRoles([IAccessRole.ADMIN]), handleRequest(createUser));
 router.put('/update/:userId', verifyToken, authorizeRoles([IAccessRole.ADMIN]), handleRequest(updateUser));
-router.get('/get', verifyToken, authorizeRoles([IAccessRole.ADMIN]), handleRequest(getUsers));
+router.get('/get', verifyToken, authorizeRoles([IAccessRole.ADMIN, IAccessRole.TEACHER]), handleRequest(getUsers));
 router.delete('/delete/:userId', verifyToken, authorizeRoles([IAccessRole.ADMIN]), handleRequest(deleteUser));
 router.get('/:id', handleRequest(getUserById));
 

@@ -3,10 +3,11 @@
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import type { FormEvent } from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { validateLogin, type LoginFormValues } from "@/lib/validation/login";
 import useAuthHook from "@/hooks/useAuth";
+import { useSearchParams } from "next/navigation";
 
 const inputBaseClass =
   "h-11 w-full rounded-lg border bg-white px-3 text-zinc-900 outline-none ring-zinc-400/20 transition-[box-shadow,border-color] placeholder:text-zinc-400 focus:ring-4 dark:bg-zinc-950 dark:text-zinc-50 dark:placeholder:text-zinc-500 dark:focus:ring-zinc-500/20";
@@ -20,6 +21,9 @@ export function LoginForm() {
   const [fieldErrors, setFieldErrors] = useState<
     Partial<Record<keyof LoginFormValues, string>>
   >({});
+
+  const searchParams = useSearchParams();
+  const reason = searchParams.get("reason");
 
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -37,6 +41,12 @@ export function LoginForm() {
     setFieldErrors({});
     loginApi.mutate(result.value);
   }
+
+  useEffect(() => {
+    if (reason === "session_expired") {
+      toast.error("Session expired. Please sign in again.");
+    }
+  }, [reason]);
 
   return (
     <form noValidate onSubmit={handleSubmit} className="flex flex-col gap-5">
@@ -99,8 +109,8 @@ export function LoginForm() {
         type="submit"
         disabled={loginApi.isPending}
         className={`mt-1 flex h-11 w-full items-center justify-center rounded-full bg-foreground px-5 text-sm font-medium text-background transition-colors hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60 ${loginApi.isPending
-            ? "cursor-not-allowed opacity-60"
-            : "cursor-pointer hover:opacity-90"
+          ? "cursor-not-allowed opacity-60"
+          : "cursor-pointer hover:opacity-90"
           }`}
       >
         {loginApi.isPending ? "Signing in…" : "Sign in"}

@@ -1,19 +1,14 @@
 import { TokenPayload } from "../interface/users";
 import { Request } from "express";
+import dotenv from "dotenv"
+
+dotenv.config()
 
 
 
-export const ADMIN_EMAIL = 'admin@gmail.com';
-export const ADMIN_PASSWORD = 'admin123';
+export const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@gmail.com';
+export const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
 
-
-
-export const adminCredentials: TokenPayload = {
-  userId: "1234566",
-  role: "ADMIN",
-  name: "suresh",
-  email: ADMIN_EMAIL,
-}
 
 
 export interface AuthRequest extends Request {
@@ -30,6 +25,8 @@ export enum IAccessRole {
 
 
 export const JWT_SECRET = process.env.JWT_SECRET || "secret";
+
+
 
 
 export const SALT_ROUNDS = 10;

@@ -3,7 +3,6 @@
 import { Request, Response } from 'express';
 import User from '../models/user.schema';
 import { generateToken } from '../utils/jwt';
-import { ADMIN_EMAIL, ADMIN_PASSWORD, adminCredentials } from '../utils/common';
 import { HttpStatusCode } from '../interface/utils';
 import { AppError } from '../utils/AppError';
 import { comparePassword } from '../utils/service';
@@ -33,7 +32,7 @@ export const login = async (req: Request, res: Response) => {
 
   // 4. Generate token using REAL user data
   const token = generateToken({
-    _id: user._id.toString(),
+    userId: user._id.toString(),
     role: user.role,
     name: user.name,
     email: user.email,

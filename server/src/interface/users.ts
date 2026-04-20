@@ -12,7 +12,7 @@ export interface IUsers {
 
 
 export type TokenPayload = {
-  _id: string;
+  userId: string;
   role: IRole;
   name: string;
   email: string;

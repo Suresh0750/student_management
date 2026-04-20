@@ -64,11 +64,15 @@ export const getUsers = async (req: Request, res: Response, next: NextFunction) 
 
     res.status(200).json({
       success: true,
-      page,
-      limit,
-      total,
-      totalPages: Math.ceil(total / limit),
       data: users,
+      pagination: {
+        currentPage: page,
+        totalPages: Math.ceil(total / limit),
+        totalItems: total,
+        itemsPerPage: limit,
+        hasPrevPage: page > 1,
+        hasNextPage: page < Math.ceil(total / limit),
+      }
     });
   } catch (err) {
     next(err);

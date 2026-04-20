@@ -4,7 +4,7 @@ import type { NextRequest } from 'next/server';
 export function middleware(request: NextRequest) {
   const token = request.cookies.get('auth_token')?.value;
   const role = request.cookies.get('user_role')?.value;
-
+  console.log(token, role, "dsafaffa")
   const { pathname } = request.nextUrl;
 
   const isAuthenticated = !!token;
@@ -21,7 +21,7 @@ export function middleware(request: NextRequest) {
 
   // 3. If admin tries to access marks or subjects pages, redirect to dashboard
   if (isAuthenticated && role === 'ADMIN') {
-    if (pathname.startsWith('/dashboard/marks') || pathname.startsWith('/dashboard/subject')) {
+    if (pathname.startsWith('/dashboard/subjects')) {
       return NextResponse.redirect(new URL('/dashboard', request.url));
     }
   }

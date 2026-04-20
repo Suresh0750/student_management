@@ -127,6 +127,7 @@ export default function StudentsPage() {
           onDelete={(row) => {
             handleDelete(row)
           }}
+          isLoading={isLoading}
         />
       </div>
       <Modal open={isModalOpen} title={isEdit ? "Edit New Students" : "Add New Students"} onClose={handleCloseModal}>

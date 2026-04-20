@@ -20,8 +20,8 @@ const getSidebarByRole = (role: AppRole): SidebarItem[] => {
       { label: "Students", path: "/dashboard/students" },
       { label: "Teachers", path: "/dashboard/teachers" },
     ],
-    TEACHER: [{ label: "Marks", path: "/dashboard/marks" }],
-    STUDENT: [{ label: "Marks", path: "/dashboard/marks" }],
+    TEACHER: [{ label: "Subject", path: "/dashboard/subjects" }],
+    STUDENT: [{ label: "Marks", path: "/dashboard" }],
   };
 
   return sidebarConfig[role] ?? [];

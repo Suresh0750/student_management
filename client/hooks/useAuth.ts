@@ -18,6 +18,7 @@ const useAuth = () => {
             if (result.token) {
                 localStorage.setItem("token", result.token);
             }
+            console.log("after login", maybeUser)
             setSession({
                 user: maybeUser,
                 token: result.token,

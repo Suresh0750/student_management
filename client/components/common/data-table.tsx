@@ -71,7 +71,7 @@ export default function DataTable<T extends Record<string, Primitive>>({
           </thead>
 
           <tbody>
-            {rows.length === 0 ? (
+            {rows?.length === 0 ? (
               <tr>
                 <td
                   colSpan={columns.length + (onEdit || onDelete ? 1 : 0)}

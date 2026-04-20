@@ -46,3 +46,46 @@ export const addUserSchema = Joi.object({
 export const editUserSchema = Joi.object({
   ...baseUserFields,
 });
+
+const marksFields = {
+  tamil: Joi.number().min(0).max(100).required().messages({
+    "number.base": "Tamil mark is required",
+    "number.min": "Min value is 0",
+    "number.max": "Max value is 100",
+  }),
+  english: Joi.number().min(0).max(100).required().messages({
+    "number.base": "English mark is required",
+    "number.min": "Min value is 0",
+    "number.max": "Max value is 100",
+  }),
+  maths: Joi.number().min(0).max(100).required().messages({
+    "number.base": "Maths mark is required",
+    "number.min": "Min value is 0",
+    "number.max": "Max value is 100",
+  }),
+  physics: Joi.number().min(0).max(100).required().messages({
+    "number.base": "Physics mark is required",
+    "number.min": "Min value is 0",
+    "number.max": "Max value is 100",
+  }),
+  chemistry: Joi.number().min(0).max(100).required().messages({
+    "number.base": "Chemistry mark is required",
+    "number.min": "Min value is 0",
+    "number.max": "Max value is 100",
+  }),
+};
+
+
+// schemas.ts
+export const addStudentSchema = Joi.object({
+  user: Joi.object().required().messages({
+    "object.base": "Please select a student",
+    "any.required": "Please select a student",
+  }),
+  ...marksFields,
+});
+
+export const editStudentSchema = Joi.object({
+  user: Joi.any().optional(),
+  ...marksFields,
+});

@@ -1,3 +1,8 @@
+// lib/api.ts
+
+import { STORAGE_KEY } from "../shared/constants";
+import { BackendPayload, ParsedBackendError } from "../types";
+import useAuth from "@/hooks/useAuth";
 
 export function apiUrl(path: string): string {
   const base = (process.env.NEXT_PUBLIC_API_URL ?? "").replace(/\/$/, "");
@@ -31,37 +36,75 @@ export async function apiFetch(
   });
 }
 
-export async function apiJson<T>(path: string, init: RequestInit = {}): Promise<T> {
-  const res = await apiFetch(path, init);
-  const parseJsonSafely = async (): Promise<unknown | null> => {
-    try {
-      return (await res.clone().json()) as unknown;
-    } catch {
-      return null;
-    }
-  };
+// ─── Types ────────────────────────────────────────────────────────────────────
 
-  const getBackendMessage = (payload: unknown): string | null => {
-    if (!payload || typeof payload !== "object") return null;
-    const maybe = payload as { success?: unknown; message?: unknown };
-    if (maybe.success === false && typeof maybe.message === "string") {
-      return maybe.message;
-    }
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+async function parseJsonSafely(res: Response): Promise<unknown | null> {
+  try {
+    return (await res.clone().json()) as unknown;
+  } catch {
     return null;
-  };
+  }
+}
+
+function parseBackendError(payload: unknown): ParsedBackendError | null {
+  if (!payload || typeof payload !== "object") return null;
+  const { success, message, code } = payload as BackendPayload;
+
+  if (success === false && typeof message === "string") {
+    return {
+      message,
+      code: typeof code === "string" ? code : null,
+    };
+  }
+  return null;
+}
+
+function handleTokenExpired(): void {
+  if (typeof window === "undefined") return;
+  document.cookie = `auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
+  document.cookie = `user_role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
+  localStorage.removeItem("token");
+  localStorage.removeItem(STORAGE_KEY)
+  window.location.href = "/login?reason=session_expired";
+}
+
+// ─── Main fetch wrapper ───────────────────────────────────────────────────────
+
+export async function apiJson<T>(
+  path: string,
+  init: RequestInit = {}
+): Promise<T> {
+  const res = await apiFetch(path, init);
 
   if (!res.ok) {
-    const payload = await parseJsonSafely();
-    const backendMessage = getBackendMessage(payload);
-    throw new Error(backendMessage ?? "Something went wrong");
+    const payload = await parseJsonSafely(res);
+    const error = parseBackendError(payload);
+
+    if (["TOKEN_EXPIRED", "NO_TOKEN"].includes(error?.code || "")) {
+      handleTokenExpired();
+      // Throw a user-facing message; the redirect will take over anyway.
+      throw new Error("Your session has expired. Redirecting to login…");
+    }
+
+    throw new Error(error?.message ?? "Something went wrong");
   }
+
   if (res.status === 204) {
     return undefined as T;
   }
+
   const payload = (await res.json()) as unknown;
-  const backendMessage = getBackendMessage(payload);
-  if (backendMessage) {
-    throw new Error(backendMessage);
+  const error = parseBackendError(payload);
+
+  if (error) {
+    if (["TOKEN_EXPIRED", "NO_TOKEN"].includes(error.code || "")) {
+      handleTokenExpired();
+      throw new Error("Your session has expired. Redirecting to login…");
+    }
+    throw new Error(error.message);
   }
+
   return payload as T;
 }

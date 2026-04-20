@@ -5,11 +5,27 @@ import { useRouter } from "next/navigation";
 import DataTable from "@/components/common/data-table";
 import { useAuth } from "@/lib/auth/auth-context";
 import { getUserRole } from "@/lib/auth/role";
-import { IUser } from "@/lib/types";
+import { IMarks, IUser } from "@/lib/types";
+import useUsers from "@/hooks/useUsers";
+import { useMarks } from "@/hooks/useMarks";
 
 export default function MarksPage() {
   const router = useRouter();
   const { user, isAuthenticated } = useAuth();
+
+  const userId = user?._id as string;
+  const {
+    state: {
+      users,
+      isLoading,
+      error
+    },
+    deleteUserApi,
+    updateUserApi,
+    createUserApi
+  } = useUsers("STUDENT")
+  const { createMarks, updateMarks, deleteMarks, marks, isLoading: isMarkLoading, isError: isMarkError, studentMarks, isStudentMarksLoading, isCreating: isMarkCreating, isUpdating: isMarkUpdating, isDeleting: isMarkDeleting } = useMarks({ studentId: userId })
+
 
   const userRole = useMemo(() => getUserRole(user), [user]);
 
@@ -37,11 +53,20 @@ export default function MarksPage() {
     }
   }, [isAuthenticated, router, userRole]);
 
-  function handleEdit(row: IUser) {
+  useEffect(() => {
+    if (user) {
+      console.log("user", user)
+    }
+  }, [user])
+  useEffect(() => {
+    console.log("studentMarks", studentMarks)
+  }, [studentMarks])
+
+  function handleEdit(row: IMarks) {
     console.log("Edit student:", row);
   }
 
-  function handleDelete(row: IUser) {
+  function handleDelete(row: IMarks) {
     console.log("Delete student:", row);
   }
 
@@ -57,13 +82,11 @@ export default function MarksPage() {
       </p>
 
       <div className="mt-6">
-        <DataTable<IUser>
+        <DataTable<IMarks>
           title="List Students Marks"
           columns={[...studentColumns]}
-          rows={[] as IUser[]}
+          rows={isStudentMarksLoading ? [] : [studentMarks] as IMarks[]}
           rowKey="_id"
-          onEdit={handleEdit}
-          onDelete={handleDelete}
         />
       </div>
     </div>

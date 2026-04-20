@@ -21,6 +21,7 @@ export const useMarks = ({ studentId }: UseMarksOptions = {}) => {
     const allMarks = useQuery({
         queryKey: [MARKS_KEY],
         queryFn: getAllMarksRequest,
+        enabled: !studentId
     });
 
     const studentMarks = useQuery({

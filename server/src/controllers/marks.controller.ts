@@ -163,3 +163,47 @@ export const deleteMarks = async (req: Request, res: Response, next: NextFunctio
         next(error);
     }
 };
+
+
+// controller
+export const getMarksByStudent = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { studentId } = req.params;
+
+        const marks = await Marks.findOne({ student: studentId, isDeleted: false })
+            .populate("student", "name email phone");
+
+        if (!marks) {
+            return res.status(HttpStatusCode.NOT_FOUND).json({
+                success: false,
+                message: "Marks not found for this student",
+            });
+        }
+
+        const student = marks.student as any;
+
+        const formatted = {
+            _id: marks._id,
+            studentId: student._id,
+            name: student.name,
+            email: student.email,
+            phone: student.phone,
+            tamil: marks.tamil,
+            english: marks.english,
+            maths: marks.maths,
+            physics: marks.physics,
+            chemistry: marks.chemistry,
+            isDeleted: marks.isDeleted,
+            createdAt: marks.createdAt,
+            updatedAt: marks.updatedAt,
+        };
+
+        return res.status(HttpStatusCode.SUCCESS).json({
+            success: true,
+            marks: formatted,
+            message: "Marks fetched successfully",
+        });
+    } catch (error) {
+        next(error);
+    }
+};

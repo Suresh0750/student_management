@@ -5,13 +5,13 @@ import { AppError } from '../utils/AppError';
 
 
 export const createUser = async (req: Request, res: Response) => {
-  const { name, email, phone, password,role } = req.body;
-  const user = await User.create({ name, email, phone, password,role });
+  const { name, email, phone, password, role } = req.body;
+  const user = await User.create({ name, email, phone, password, role });
 
   return res.status(HttpStatusCode.CREATED).json({
-    success : true,
+    success: true,
     user,
-    message : `success fully created ${role?.toLowerCase()}`
+    message: `success fully created ${role?.toLowerCase()}`
   });
 }
 
@@ -84,6 +84,29 @@ export const updateUser = async (req: Request, res: Response) => {
       success: true,
       user: updatedUser,
       message: `Successfully updated ${updatedUser.role?.toLowerCase()}`,
+    });
+  } catch (error) {
+    return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: "Something went wrong",
+      error,
+    });
+  }
+};
+
+export const deleteUser = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.params;
+    const user = await User.findByIdAndDelete(userId);
+    if (!user) {
+      return res.status(HttpStatusCode.NOT_FOUND).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+    return res.status(HttpStatusCode.SUCCESS).json({
+      success: true,
+      message: "User deleted successfully",
     });
   } catch (error) {
     return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({

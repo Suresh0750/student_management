@@ -5,9 +5,8 @@ import { useRouter } from "next/navigation";
 import type { FormEvent } from "react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { loginRequest, type LoginResult } from "@/lib/api/auth";
-import { useAuth, type AuthUser } from "@/lib/auth/auth-context";
 import { validateLogin, type LoginFormValues } from "@/lib/validation/login";
+import useAuthHook from "@/hooks/useAuth";
 
 const inputBaseClass =
   "h-11 w-full rounded-lg border bg-white px-3 text-zinc-900 outline-none ring-zinc-400/20 transition-[box-shadow,border-color] placeholder:text-zinc-400 focus:ring-4 dark:bg-zinc-950 dark:text-zinc-50 dark:placeholder:text-zinc-500 dark:focus:ring-zinc-500/20";
@@ -17,39 +16,14 @@ const inputErrClass =
   "border-red-500 focus:border-red-500 dark:border-red-500 dark:focus:border-red-500";
 
 export function LoginForm() {
-  const router = useRouter();
-  const { setSession } = useAuth();
+  const { loginApi } = useAuthHook();
   const [fieldErrors, setFieldErrors] = useState<
     Partial<Record<keyof LoginFormValues, string>>
   >({});
 
-  const login = useMutation({
-    mutationFn: loginRequest,
-    onSuccess: (data) => {
-      const result = data as LoginResult;
-      const maybeUser = ((result.user && typeof result.user === "object")
-        ? result.user
-        : result) as AuthUser;
-        if(result.token){
-          localStorage.setItem("token",result.token)
-        }
-      setSession({
-        user: maybeUser,
-        token: result.token,
-      });
-      router.push("/dashboard");
-      router.refresh();
-    },
-    onError: (error) => {
-      const message = 
-        error instanceof Error ? error.message : "Something went wrong";
-      toast.error(message);
-    },
-  });
-
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    login.reset();
+    loginApi.reset();
     const data = new FormData(e.currentTarget);
     const raw: LoginFormValues = {
       email: String(data.get("email") ?? ""),
@@ -61,7 +35,7 @@ export function LoginForm() {
       return;
     }
     setFieldErrors({});
-    login.mutate(result.value);
+    loginApi.mutate(result.value);
   }
 
   return (
@@ -123,10 +97,10 @@ export function LoginForm() {
       </div>
       <button
         type="submit"
-        disabled={login.isPending}
+        disabled={loginApi.isPending}
         className="mt-1 flex h-11 w-full items-center justify-center rounded-full bg-foreground px-5 text-sm font-medium text-background transition-colors hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
       >
-        {login.isPending ? "Signing in…" : "Sign in"}
+        {loginApi.isPending ? "Signing in…" : "Sign in"}
       </button>
     </form>
   );

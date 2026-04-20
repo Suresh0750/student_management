@@ -2,9 +2,10 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/lib/auth/auth-context";
+import useAuth from "@/hooks/useAuth";
 import { getUserRole, type AppRole } from "@/lib/auth/role";
 import { usePathname } from "next/navigation";
+import { toast } from "sonner";
 
 const DASHBOARD = "/dashboard"
 
@@ -34,8 +35,9 @@ export default function DashboardLayout({
 }) {
   const router = useRouter();
   const pathname = usePathname();
-  const { user, logout } = useAuth();
-  const [activeTab,setActiveTab] = useState("")
+  const { state, logout } = useAuth();
+  const { user } = state;
+  const [activeTab, setActiveTab] = useState("")
   const userName = useMemo(() => {
     if (!user || typeof user !== "object") return "Student";
     const maybeName = (user as { name?: unknown }).name;
@@ -52,19 +54,26 @@ export default function DashboardLayout({
   );
 
   function handleLogout() {
-    logout();
-    router.push("/login");
-    router.refresh();
+    toast("Are you sure you want to log out?", {
+      action: {
+        label: "Yes",
+        onClick: () => logout(),
+      },
+      cancel: {
+        label: "Cancel",
+        onClick: () => { },
+      },
+    });
   }
 
-  const isActive = (activeBar:string)=>{
-    return activeBar==pathname ? "bg-zinc-900 text-white"
+  const isActive = (activeBar: string) => {
+    return activeBar == pathname ? "bg-zinc-900 text-white"
       : "text-zinc-700 hover:bg-zinc-100 hover:text-black"
   }
 
   return (
     <div className="min-h-[calc(100vh-7rem)] rounded-xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950 md:grid md:grid-cols-[260px_1fr]">
-      
+
       {/* Sidebar */}
       <aside className="border-b border-zinc-200 p-5 dark:border-zinc-800 md:border-b-0 md:border-r">
         <div className="mb-6">
@@ -74,7 +83,7 @@ export default function DashboardLayout({
         </div>
 
         <nav className="space-y-2">
-          <button className={`w-full rounded-md px-3 py-2 text-left text-sm ${isActive(DASHBOARD)}`} onClick={()=>router.push(DASHBOARD)}>
+          <button className={`w-full rounded-md px-3 py-2 text-left text-sm ${isActive(DASHBOARD)}`} onClick={() => router.push(DASHBOARD)}>
             Overview
           </button>
 
@@ -91,7 +100,7 @@ export default function DashboardLayout({
 
         <button
           onClick={handleLogout}
-          className="mt-6 w-full rounded-md border px-3 py-2 text-sm hover:bg-zinc-100"
+          className="mt-6 w-full rounded-md border px-3 py-2 text-sm hover:bg-zinc-100 cursor-pointer"
         >
           Logout
         </button>

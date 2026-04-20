@@ -39,3 +39,9 @@ export async function updateUsers({ id, body }: { id: string; body: IUser }): Pr
     body: JSON.stringify(body),
   });
 }
+
+export async function deleteUser(id: string): Promise<ApiResponse<IUser>> {
+  return apiJson<ApiResponse<IUser>>(`${API_URL}/user/delete/${id}`, {
+    method: "DELETE",
+  });
+}

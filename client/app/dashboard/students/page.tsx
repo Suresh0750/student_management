@@ -12,6 +12,7 @@ import { IUser } from "@/lib/types";
 import { ADD_FIELDS, EDIT_FIELDS } from "@/lib/shared/constants";
 import { addUserSchema, editUserSchema } from "@/lib/validation/users.schema";
 import useUsers from "@/hooks/useUsers";
+import { toast } from "sonner";
 
 
 export default function StudentsPage() {
@@ -28,6 +29,7 @@ export default function StudentsPage() {
       isLoading,
       error
     },
+    deleteUserApi,
     updateUserApi,
     createUserApi
   } = useUsers()
@@ -39,7 +41,7 @@ export default function StudentsPage() {
   }
 
   const updateStudents = (data: any) => {
-    if(!editUser) return
+    if (!editUser) return
     updateUserApi.mutate({ id: editUser._id, body: { ...editUser, ...data } });
     handleCloseModal?.()
   };
@@ -82,9 +84,21 @@ export default function StudentsPage() {
   function handleEdit(row: IUser) {
     console.log("Edit student:", row);
   }
-
   function handleDelete(row: IUser) {
-    console.log("Delete student:", row);
+    toast("Are you sure you want to delete?", {
+      action: {
+        label: "Yes",
+        onClick: () => {
+          deleteUserApi.mutate(row._id);
+        },
+      },
+      cancel: {
+        label: "Cancel",
+        onClick: () => {
+          toast("Cancelled");
+        },
+      },
+    });
   }
 
   if (!isAuthenticated || userRole !== "ADMIN") {

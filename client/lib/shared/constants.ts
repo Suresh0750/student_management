@@ -8,7 +8,7 @@ const BASE_FIELDS: FieldConfig[] = [
   
   export const ADD_FIELDS: FieldConfig[] = [
     ...BASE_FIELDS,
-    { name: "password", label: "Password", type: "password", validation: { required: "Required" } },
+    { name: "password", label: "Password", type: "password", info: "Must be at least 6 characters, including 1 letter and 1 number.", validation: { required: "Required" } },
   ];
   
   export const EDIT_FIELDS: FieldConfig[] = [

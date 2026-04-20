@@ -8,6 +8,7 @@ export type FieldConfig = {
   name: string;
   label: string;
   type?: string;
+  info?: string;
   minLength?: number;
   maxLength?: number;
   validation?: {
@@ -58,11 +59,12 @@ function DynamicForm<T extends FieldValues>({
 
   return (
     <form onSubmit={handleSubmit(submitHandler)} className="space-y-3">
-      {fields.map(({ name, label, type, minLength, maxLength }) => (
+      {fields.map(({ name, label, type, info, minLength, maxLength }) => (
         <Input
           key={name}
           label={label}
           type={type}
+          info={info}
           {...register(name as Parameters<typeof register>[0])}
           error={errors[name]?.message as string}
           minLength={minLength}

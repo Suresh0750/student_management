@@ -1,4 +1,5 @@
 import Joi from "joi";
+import { emailSchema, passwordSchema } from "./users.schema";
 
 export type LoginFormValues = {
   email: string;
@@ -6,21 +7,8 @@ export type LoginFormValues = {
 };
 
 export const loginSchema = Joi.object({
-  email: Joi.string()
-    .trim()
-    .lowercase()
-    .email({ tlds: { allow: false } })
-    .required()
-    .messages({
-      "string.empty": "Email is required",
-      "any.required": "Email is required",
-      "string.email": "Enter a valid email address",
-    }),
-  password: Joi.string().required().min(8).messages({
-    "string.empty": "Password is required",
-    "any.required": "Password is required",
-    "string.min": "Password must be at least {#limit} characters",
-  }),
+  email: emailSchema,
+  password: passwordSchema
 });
 
 export function validateLogin(values: LoginFormValues):

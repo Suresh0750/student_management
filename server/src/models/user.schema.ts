@@ -8,8 +8,9 @@ const userSchema = new mongoose.Schema({
     email: {
         type: String,
         required: true,
+        unique: true,
     },
-    phone : {
+    phone: {
         type: String,
         required: true,
     },
@@ -25,12 +26,12 @@ const userSchema = new mongoose.Schema({
         type: Date,
         default: Date.now,
     },
-    role : {
+    role: {
         type: String,
         enum: ['ADMIN', 'TEACHER', 'STUDENT'],
         default: 'STUDENT',
     },
-    isDeleted : {
+    isDeleted: {
         type: Boolean,
         default: false,
     },

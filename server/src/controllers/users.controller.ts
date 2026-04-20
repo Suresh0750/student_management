@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import User from '../models/user.schema';
 import { HttpStatusCode } from '../interface/utils';
 import { AppError } from '../utils/AppError';
@@ -6,16 +6,26 @@ import { hashPassword } from '../utils/service';
 
 
 
-export const createUser = async (req: Request, res: Response) => {
-  const { name, email, phone, password, role } = req.body;
-  const hashedPassword = await hashPassword(password);
-  const user = await User.create({ name, email, phone, password: hashedPassword, role });
+export const createUser = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { name, email, phone, password, role } = req.body;
+    const hashedPassword = await hashPassword(password);
+    const user = await User.create({ name, email, phone, password: hashedPassword, role });
 
-  return res.status(HttpStatusCode.CREATED).json({
-    success: true,
-    user,
-    message: `success fully created ${role?.toLowerCase()}`
-  });
+    return res.status(HttpStatusCode.CREATED).json({
+      success: true,
+      user,
+      message: `successfully created ${role?.toLowerCase() || 'user'}`
+    });
+  } catch (error: any) {
+    if (error.code === 11000) {
+      return res.status(HttpStatusCode.BAD_REQUEST).json({
+        success: false,
+        message: "User with this email already exists."
+      });
+    }
+    next(error);
+  }
 }
 
 
@@ -28,7 +38,7 @@ export const getUserById = async (req: Request, res: Response) => {
   return res.status(HttpStatusCode.SUCCESS).json(user);
 }
 
-export const getUsers = async (req, res, next) => {
+export const getUsers = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const page = Number(req.query.page) || 1;
     const limit = Number(req.query.limit) || 10;
@@ -37,10 +47,11 @@ export const getUsers = async (req, res, next) => {
     const skip = (page - 1) * limit;
 
     // filter
-    const filter: any = {};
+    const filter: any = { isDeleted: false };
     if (role) {
       filter.role = role;
     }
+    console.log(filter, "queryfilter");
 
     // query
     const users = await User.find(filter)
@@ -100,16 +111,24 @@ export const updateUser = async (req: Request, res: Response) => {
 export const deleteUser = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
-    const user = await User.findByIdAndDelete(userId);
+
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { isDeleted: true },
+      { new: true }
+    );
+
     if (!user) {
       return res.status(HttpStatusCode.NOT_FOUND).json({
         success: false,
         message: "User not found",
       });
     }
+
     return res.status(HttpStatusCode.SUCCESS).json({
       success: true,
-      message: "User deleted successfully",
+      user,
+      message: "User deleted successfully (soft delete)",
     });
   } catch (error) {
     return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({

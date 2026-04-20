@@ -60,3 +60,36 @@ export const getUsers = async (req, res, next) => {
     next(err);
   }
 };
+
+
+export const updateUser = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.params;
+    const { name, email, phone, password, role } = req.body;
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { name, email, phone, password, role },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(HttpStatusCode.NOT_FOUND).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    return res.status(HttpStatusCode.SUCCESS).json({
+      success: true,
+      user: updatedUser,
+      message: `Successfully updated ${updatedUser.role?.toLowerCase()}`,
+    });
+  } catch (error) {
+    return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: "Something went wrong",
+      error,
+    });
+  }
+};

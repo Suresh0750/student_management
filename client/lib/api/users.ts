@@ -15,21 +15,26 @@ export type ApiResponseBase = {
   message: string;
 };
 export type ApiResponse<T> = ApiResponseBase & {
-  [key: string] : T
+  [key: string]: T
 };
 
-export async function getUsersRequest(): Promise<IUser[]> {
-  const res = await apiJson<ApiResponse<IUser[]>>(`${API_URL}/user/get`);
+
+export async function getUsersRequest(role?: string): Promise<IUser[]> {
+  const url = role
+    ? `${API_URL}/user/get?role=${role}`
+    : `${API_URL}/user/get`;
+
+  const res = await apiJson<ApiResponse<IUser[]>>(url);
   return res.data;
 }
 
 
-export async function createUsers(body:IUser):  Promise<ApiResponse<IUser>>{
+export async function createUsers(body: IUser): Promise<ApiResponse<IUser>> {
   return apiJson<ApiResponse<IUser>>(`${API_URL}/user/create`, {
     method: "POST",
     body: JSON.stringify(body),
   });
- ;
+  ;
 }
 
 // api function
@@ -44,4 +49,4 @@ export async function deleteUser(id: string): Promise<ApiResponse<IUser>> {
   return apiJson<ApiResponse<IUser>>(`${API_URL}/user/delete/${id}`, {
     method: "DELETE",
   });
-}
+}

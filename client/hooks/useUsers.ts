@@ -4,13 +4,13 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 
-const useUsers = () => {
+const useUsers = (role?: string) => {
 
   const queryClient = useQueryClient();
 
   const { data: users = [], isLoading, error } = useQuery({
-    queryKey: ["users"],
-    queryFn: getUsersRequest,
+    queryKey: ["users", role],
+    queryFn: () => getUsersRequest(role),
   });
   const createUserApi = useMutation<ApiResponse<IUser>, Error, IUser>({
     mutationFn: createUsers,
@@ -18,7 +18,7 @@ const useUsers = () => {
       const result = data;
       const { user = null } = result
       if (user) {
-        queryClient.setQueryData<IUser[]>(["users"], (oldUsers = []) => {
+        queryClient.setQueryData<IUser[]>(["users", role], (oldUsers = []) => {
           const exists = oldUsers.some((u) => u._id === user._id);
           if (exists) return oldUsers;
           return [...oldUsers, user];
@@ -41,7 +41,7 @@ const useUsers = () => {
     onSuccess: (data) => {
       const { user = null, message } = data;
       if (user) {
-        queryClient.setQueryData<IUser[]>(["users"], (oldUsers = []) => {
+        queryClient.setQueryData<IUser[]>(["users", role], (oldUsers = []) => {
           // ⚠️ Fix: update existing user instead of skipping if exists
           return oldUsers.map((u) => (u._id === user._id ? user : u));
         });
@@ -57,7 +57,7 @@ const useUsers = () => {
   const deleteUserApi = useMutation<ApiResponse<IUser>, Error, string>({
     mutationFn: deleteUser,
     onSuccess: (data, deletedUserId) => {
-      queryClient.setQueryData<IUser[]>(["users"], (oldUsers = []) => {
+      queryClient.setQueryData<IUser[]>(["users", role], (oldUsers = []) => {
         return oldUsers.filter((u) => u._id !== deletedUserId);
       });
     },

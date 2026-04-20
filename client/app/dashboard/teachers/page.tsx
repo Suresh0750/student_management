@@ -12,6 +12,7 @@ import UserForm from "@/components/forms/UserForm";
 import { addUserSchema, editUserSchema } from "@/lib/validation/users.schema";
 import { ADD_FIELDS, EDIT_FIELDS } from "@/lib/shared/constants";
 import useUsers from "@/hooks/useUsers";
+import { toast } from "sonner";
 
 export default function TeachersPage() {
   const router = useRouter();
@@ -28,7 +29,7 @@ export default function TeachersPage() {
     deleteUserApi,
     updateUserApi,
     createUserApi
-  } = useUsers()
+  } = useUsers("TEACHER")
   const userRole = useMemo(() => getUserRole(user), [user]);
 
   const teacherColumns = useMemo(
@@ -77,7 +78,22 @@ export default function TeachersPage() {
   }
 
   function handleDelete(row: IUser) {
-    console.log("Delete teacher:", row);
+    toast("Are you sure you want to delete?", {
+      action: {
+        label: "Yes",
+        onClick: () => {
+          const toastId = toast.loading("Deleting...");
+          deleteUserApi.mutate(row._id);
+          toast.success("Deleted", { id: toastId });
+        },
+      },
+      cancel: {
+        label: "Cancel",
+        onClick: () => {
+          toast("Cancelled");
+        },
+      },
+    });
   }
 
 
@@ -98,9 +114,13 @@ export default function TeachersPage() {
         <DataTable<IUser>
           title="List Teachers"
           columns={[...teacherColumns]}
-          rows={[] as IUser[]}
+          rows={users}
           rowKey="_id"
-          onEdit={handleEdit}
+          onEdit={(row) => {
+            setIsEdit(true);
+            setEditUser(row);
+            setIsModalOpen(true);
+          }}
           onDelete={handleDelete}
         />
       </div>

@@ -32,7 +32,7 @@ export default function StudentsPage() {
     deleteUserApi,
     updateUserApi,
     createUserApi
-  } = useUsers()
+  } = useUsers("STUDENT")
 
   const addStudents = (data: any) => {
     console.log("students data", data)

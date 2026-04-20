@@ -1,7 +1,7 @@
 "use client";
 
 type Primitive = string | number | boolean | null | undefined;
-import { Pencil, Trash, Trash2 } from "lucide-react";
+import { Pencil, Trash, Trash2, Loader2 } from "lucide-react";
 
 
 
@@ -14,6 +14,7 @@ type DataTableColumn<T> = {
 type DataTableProps<T> = {
   title?: string;
   columns: Array<DataTableColumn<T>>;
+  isLoading?: boolean;
   rows: T[];
   rowKey: keyof T;
   onEdit?: (row: T) => void;
@@ -24,12 +25,21 @@ type DataTableProps<T> = {
 export default function DataTable<T extends Record<string, Primitive>>({
   title,
   columns,
+  isLoading,
   rows,
   rowKey,
   onEdit,
-  onDelete, 
+  onDelete,
   emptyMessage = "No data available.",
 }: DataTableProps<T>) {
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-8">
+        <Loader2 size="md" />
+      </div>
+    );
+  }
   return (
     <div className="overflow-hidden rounded-lg border border-zinc-200 dark:border-zinc-800">
       {title ? (
@@ -71,7 +81,7 @@ export default function DataTable<T extends Record<string, Primitive>>({
                 </td>
               </tr>
             ) : (
-              rows?.map((row:T) => (
+              rows?.map((row: T) => (
                 <tr
                   key={String(row[rowKey])}
                   className="border-b border-zinc-200 last:border-b-0 dark:border-zinc-800"

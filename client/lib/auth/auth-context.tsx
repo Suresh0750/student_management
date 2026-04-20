@@ -72,7 +72,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const logout = useCallback(() => setSession(null), [setSession]);
+  const logout = useCallback(() => {
+    setSession(null)
+  }, [setSession]);
 
   const value = useMemo<AuthContextValue>(
     () => ({

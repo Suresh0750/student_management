@@ -20,8 +20,8 @@ const getSidebarByRole = (role: AppRole): SidebarItem[] => {
       { label: "Students", path: "/dashboard/students" },
       { label: "Teachers", path: "/dashboard/teachers" },
     ],
-    TEACHER: [{ label: "Subject", path: "/dashboard" }],
-    STUDENT: [{ label: "Marks", path: "/dashboard" }],
+    TEACHER: [{ label: "Marks", path: "/dashboard/marks" }],
+    STUDENT: [{ label: "Marks", path: "/dashboard/marks" }],
   };
 
   return sidebarConfig[role] ?? [];
@@ -82,7 +82,7 @@ export default function DashboardLayout({
         </div>
 
         <nav className="space-y-2">
-          <button className={`w-full rounded-md px-3 py-2 text-left text-sm ${isActive(DASHBOARD)}`} onClick={() => router.push(DASHBOARD)}>
+          <button className={`w-full rounded-md px-3 py-2 text-left text-sm cursor-pointer ${isActive(DASHBOARD)}`} onClick={() => router.push(DASHBOARD)}>
             Overview
           </button>
 
